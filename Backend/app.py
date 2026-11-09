@@ -1,10 +1,16 @@
+import os
+
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 
 app = Flask(__name__)
-client = MongoClient("mongodb+srv://deekshith:1234@peter.xxxxx.mongodb.net/", serverSelectionTimeoutMS=5000)
-# Local MongoDB (start the MongoDB service first)
-client = MongoClient("mongodb://localhost:27017/", serverSelectionTimeoutMS=3000)
+
+MONGO_URI = os.environ.get(
+    "MONGO_URI",
+    "mongodb+srv://<user>:<password>@peter.yzwqobh.mongodb.net/?retryWrites=true&w=majority",
+)
+
+client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
 db = client["todo_db"]
 collection = db["todo_items"]
 
@@ -25,7 +31,7 @@ def submit_todo_item():
     try:
         collection.insert_one({
             "itemName": item_name,
-            "itemDescription": item_description
+            "itemDescription": item_description,
         })
     except Exception as e:
         return jsonify({"error": "Database error", "details": str(e)}), 500
